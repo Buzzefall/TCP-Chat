@@ -53,6 +53,16 @@ namespace ChatClient
             connectThread.Start();
         }
 
+        public void End()
+        {
+            //Флаг прекращения работы, который воспримет ListenThread
+            IsRunning = false;
+            //
+            ListenThread?.Abort();
+            Stream?.Close();
+            Client?.Close();
+        }
+
         public void Start()
         {
             loginForm.UpdateView("Attempting to connect...", Color.Blue);
@@ -79,16 +89,6 @@ namespace ChatClient
             Stream = Client.GetStream();
 
             loginForm.UpdateView("Connection has been established.", Color.ForestGreen);
-        }
-
-        public void End()
-        {
-            //Флаг прекращения работы, который воспримет ListenThread
-            IsRunning = false;
-            //
-            ListenThread.Abort();
-            Stream?.Close();
-            Client?.Close();
         }
 
         //Вход и автоматическая регистрация в случае нового юзера
@@ -260,7 +260,7 @@ namespace ChatClient
                     }
                 );
 
-            Thread.Sleep(4000);
+            Thread.Sleep(3500);
             sessionForm?.Close();
         }
     }
