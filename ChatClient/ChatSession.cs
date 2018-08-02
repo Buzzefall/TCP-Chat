@@ -21,7 +21,7 @@ namespace ChatClient
         protected internal string Password { get; private set; }
         protected internal string Name { get; private set; }
         protected internal int UserID { get; private set; }
-
+        
         protected internal IPEndPoint RemoteEndPoint { get; private set; }
         protected internal IPEndPoint LocalEndPoint { get; private set; }
 
