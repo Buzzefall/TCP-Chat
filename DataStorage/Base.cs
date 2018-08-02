@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DataStorage
 {
-    public class DataBase : IBase
+    public class DataBase : IBase, IDisposable
     {
         //[PrimaryKey]
         private readonly string dbFileLocation;
@@ -42,6 +42,11 @@ namespace DataStorage
 
 
             return connected;
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }
