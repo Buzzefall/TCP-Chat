@@ -14,8 +14,8 @@ namespace ChatClient
     {
         //Ссылки на формы для взаимодействия с GUI
 
-        protected internal ChatClientForm loginForm = null;
-        protected internal ChatSessionForm sessionForm = null;
+        protected internal ChatClientForm loginForm;
+        protected internal ChatSessionForm sessionForm;
 
         protected internal string Login { get; private set; }
         protected internal string Password { get; private set; }

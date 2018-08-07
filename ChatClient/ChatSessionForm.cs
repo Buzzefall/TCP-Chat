@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using DataPackaging;
 
@@ -114,8 +115,32 @@ namespace ChatClient
         private void ChatSessionForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Owner.Visible = true;
-            CurrentSession.End();
-            (Owner as ChatClientForm).NewChatSession();
+            CurrentSession?.End();
+            (Owner as ChatClientForm)?.NewChatSession();
+        }
+
+        private void ChatTextBox_TextChanged(object sender, EventArgs e)
+        {
+            Utils.SendMessage(ChatTextBox.Handle, Utils.WM_VSCROLL, (IntPtr) Utils.SB_BOTTOM, IntPtr.Zero);
+        }
+
+    }
+
+    public class Utils
+    {
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
+
+        public const int WM_VSCROLL = 0x115;
+        public const int SB_BOTTOM = 7;
+
+        /// <summary>
+        /// Scrolls the vertical scroll bar of a multi-line text box to the bottom.
+        /// </summary>
+        /// <param name="tb">The text box to scroll</param>
+        public static void ScrollToBottom(TextBox tb)
+        {
+            SendMessage(tb.Handle, WM_VSCROLL, (IntPtr)SB_BOTTOM, IntPtr.Zero);
         }
     }
 }

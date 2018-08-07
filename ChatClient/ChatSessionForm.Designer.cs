@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.ChatTextBox = new System.Windows.Forms.TextBox();
             this.OnlineLabel = new System.Windows.Forms.Label();
             this.OnlineTextBox = new System.Windows.Forms.TextBox();
@@ -47,6 +46,7 @@
             this.ChatTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.ChatTextBox.Size = new System.Drawing.Size(612, 375);
             this.ChatTextBox.TabIndex = 0;
+            this.ChatTextBox.TextChanged += new System.EventHandler(this.ChatTextBox_TextChanged);
             // 
             // OnlineLabel
             // 
@@ -106,8 +106,6 @@
         }
 
         #endregion
-
-        private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.TextBox ChatTextBox;
         private System.Windows.Forms.Label OnlineLabel;
         private System.Windows.Forms.TextBox OnlineTextBox;
