@@ -56,6 +56,7 @@ namespace ChatClient
         {
             StartPosition = FormStartPosition.CenterScreen;
             InitializeComponent();
+
             // Инициализируем объект с логикой и данными для чата
             NewChatSession();
         }
