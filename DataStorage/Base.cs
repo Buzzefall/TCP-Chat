@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Data.SQLite;
+//using System.Data.SQLite;
 using System.IO;
 
 namespace DataStorage
@@ -11,16 +11,16 @@ namespace DataStorage
         private readonly string dbFileName;
         private readonly string dbFilePath;
 
-        private SQLiteConnection Connection { get; set; }
-        private SQLiteCommand Command { get; set; }
+        //private SQLiteConnection Connection { get; set; }
+        //private SQLiteCommand Command { get; set; }
 
         public DataBase()
         {
-            dbFileLocation = @"Data\";
-            dbFileName = "LocalStorage.sqlite";
-            dbFilePath = dbFileLocation + dbFileName;
-            Connection = new SQLiteConnection();
-            Command = new SQLiteCommand();
+            //dbFileLocation = @"Data\";
+            //dbFileName = "LocalStorage.sqlite";
+            //dbFilePath = dbFileLocation + dbFileName;
+            //Connection = new SQLiteConnection();
+            //Command = new SQLiteCommand();
         }
 
 
@@ -28,17 +28,17 @@ namespace DataStorage
         {
             var connected = false;
 
-            if (!File.Exists(dbFilePath)) SQLiteConnection.CreateFile(dbFilePath);
+            //if (!File.Exists(dbFilePath)) SQLiteConnection.CreateFile(dbFilePath);
             
-            try
-            {
-                Connection = new SQLiteConnection("Data Source=" + dbFilePath + ";Version=3;");
-            }
+            //try
+            //{
+            //    Connection = new SQLiteConnection("Data Source=" + dbFilePath + ";Version=3;");
+            //}
 
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //}
 
 
             return connected;
