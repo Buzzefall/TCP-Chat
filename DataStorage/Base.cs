@@ -14,6 +14,11 @@ namespace DataStorage
         //private SQLiteConnection Connection { get; set; }
         //private SQLiteCommand Command { get; set; }
 
+        ~DataBase()
+        {
+            Dispose();
+        }
+
         public DataBase()
         {
             //dbFileLocation = @"Data\";
