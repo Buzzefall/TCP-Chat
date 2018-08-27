@@ -17,6 +17,19 @@ namespace ChatClient
         protected internal ChatClientForm loginForm;
         protected internal ChatSessionForm sessionForm;
 
+        delegate void FormNewChatSession();
+        delegate ChatSessionForm FormSwitchToChat();
+        delegate void FormUpdateChat(TextMessage message);
+        delegate void FormUpdateOnlineList(OnlineList list);
+        delegate void FormUpdateView(string info, Color color);
+
+        
+        private FormNewChatSession NewChatSession;
+        private FormSwitchToChat SwitchToChat;
+        private FormUpdateChat UpdateChat;
+        private FormUpdateOnlineList UpdateOnlineList;
+        private FormUpdateView UpdateView;
+        
         protected internal string Login { get; private set; }
         protected internal string Password { get; private set; }
         protected internal string Name { get; private set; }
@@ -34,23 +47,28 @@ namespace ChatClient
 
         private Thread ListenThread;
 
-        //~ChatSession()
-        //{
-        //    // 
-        //    End();
-        //}
+        ~ChatSession()
+        {
+            // 
+            End();
+        }
 
         public ChatSession(ChatClientForm loginform)
         {
+
             loginForm = loginform;
-
-            IsRunning = true;
-
             RemoteEndPoint = new IPEndPoint(IPAddress.Loopback, 33777);
             LocalEndPoint = new IPEndPoint(IPAddress.Loopback, 0);
 
+            UpdateView = loginForm.UpdateView;
+            NewChatSession = loginForm.NewChatSession;
+            SwitchToChat = loginForm.SwitchToChat;
+            
+            IsRunning = true;
             var connectThread = new Thread(Start);
             connectThread.Start();
+
+
         }
 
         public void End()
@@ -65,8 +83,12 @@ namespace ChatClient
 
         public void Start()
         {
-            loginForm.UpdateView("Attempting to connect...", Color.Blue);
-            //Пытаемся соединиться
+            
+            
+            var task = loginForm.BeginInvoke(UpdateView, "Attempting to connect...", Color.Blue);
+            //var result = loginForm.EndInvoke(task);
+
+            // Пытаемся соединиться
             do
             {
                 if (!IsRunning) return;
@@ -88,7 +110,7 @@ namespace ChatClient
 
             Stream = Client.GetStream();
 
-            loginForm.UpdateView("Connection has been established.", Color.ForestGreen);
+            loginForm.BeginInvoke(UpdateView, "Connection has been established.", Color.ForestGreen);
         }
 
         //Вход и автоматическая регистрация в случае нового юзера
@@ -100,7 +122,7 @@ namespace ChatClient
             {
                 End();
                 CrashAndReport(new Exception("Connection is lost. Attempting to reconnect..."));
-                loginForm.NewChatSession();
+                loginForm.BeginInvoke(NewChatSession);
                 return;
             }
 
@@ -127,23 +149,28 @@ namespace ChatClient
                 
                 if (message?.GetType() == typeof(TextMessage) && (message as TextMessage).Text == "Access granted!")
                 {
-                    loginForm.UpdateView("Access granted!", Color.Blue);
+                    loginForm.BeginInvoke(UpdateView, "Access granted!", Color.Blue);
                     Thread.Sleep(350);
-                    loginForm.SwitchToChat();
-                    ListenThread = new Thread(Listen);
+                    
+                    var form = loginForm.Invoke(SwitchToChat);
+                    sessionForm = (ChatSessionForm) form;
 
+                    UpdateChat = sessionForm.UpdateChat;
+                    UpdateOnlineList = sessionForm.UpdateOnlineList;
+
+                    ListenThread = new Thread(Listen);
                     ListenThread.Start();
                 }
 
                 else
                 {
-                    loginForm.UpdateView("Wrong password or username", Color.Red);
+                    loginForm.BeginInvoke(UpdateView, "Wrong password or username", Color.Red);
                 }
             }
 
             if (counter >= 250)
             {
-                loginForm.UpdateView("Message receive problem.", Color.Red);
+                loginForm.BeginInvoke(UpdateView, "Message receive problem.", Color.Red);
             }
         }
 
@@ -168,12 +195,12 @@ namespace ChatClient
 
                     if (message?.GetType() == typeof(TextMessage))
                     {
-                        sessionForm.UpdateChat(message as TextMessage);
+                        sessionForm.BeginInvoke(UpdateChat, message as TextMessage);
                     }
 
                     if (message?.GetType() == typeof(OnlineList))
                     {
-                        sessionForm.UpdateOnlineList(message as OnlineList);
+                        sessionForm.BeginInvoke(UpdateOnlineList, message as OnlineList);
                     }
                 }
 
@@ -215,8 +242,7 @@ namespace ChatClient
             {
                 if (Stream.DataAvailable)
                 {
-                    var binform = new BinaryFormatter();
-                    return binform.Deserialize(Stream);
+                    return new BinaryFormatter().Deserialize(Stream);
                 }
                 
             }
@@ -248,10 +274,10 @@ namespace ChatClient
         {
             if (loginForm.Visible)
             {
-                loginForm.UpdateView(exception.Message, Color.Red);
+                loginForm.BeginInvoke(UpdateView, exception.Message, Color.Red);
             }
             else
-                sessionForm?.UpdateChat(
+                sessionForm?.BeginInvoke(UpdateChat,
                     new TextMessage
                     {
                         From = "System",
