@@ -10,7 +10,7 @@ namespace ChatClient
         public ChatSession CurrentSession;
 
         /// Метод для обновления View логин-формы через клиентскую модель.
-        public void UpdateView(string info, Color color)
+        public async void UpdateView(string info, Color color)
         {
             InfoLabel.ForeColor = color;
             InfoLabel.Text = info;
@@ -18,12 +18,14 @@ namespace ChatClient
         }
 
         /// Метод, создающий форму для чат-сессии
-        public void SwitchToChat()
+        public ChatSessionForm SwitchToChat()
         {
             Visible = false;
 
-            var form = new ChatSessionForm(this);
-            form.Show();
+            var sessionForm = new ChatSessionForm(this);
+            sessionForm.Show();
+
+            return sessionForm;
         }
 
         /// Метод, открывающий новое соединение с сервером

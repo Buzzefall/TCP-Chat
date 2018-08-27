@@ -46,7 +46,7 @@ namespace ChatClient
 
             Owner = owner;
             CurrentSession = owner.CurrentSession;
-            CurrentSession.sessionForm = this;
+            //CurrentSession.sessionForm = this;
 
             MessageBox.ForeColor = Color.DarkGray;
             MessageBox.Text = "Type something here...";
