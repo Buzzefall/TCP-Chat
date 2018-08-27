@@ -84,7 +84,7 @@ namespace ChatServer
 
             while (IsRunning)
             {
-                CheckConnections(usersOnline, DisconnectUser);
+                CheckConnections(DisconnectUser);
 
                 foreach (var user in usersOnline)
                 {
@@ -134,20 +134,6 @@ namespace ChatServer
                         break;
                     }
                 }
-                //CONTINUE_AUTHORIZATION:
-                //foreach (var user in usersToAuthorize)
-                //{
-                //    if (user.Client.Connected)
-                //    {
-                //        if (Authorize(user))
-                //            goto CONTINUE_AUTHORIZATION;
-                //    }
-                //    else
-                //    {
-                //        usersToAuthorize.Remove(user);
-                //        goto CONTINUE_AUTHORIZATION;
-                //    }
-                //}
             }
             Shutdown();
         }
@@ -263,7 +249,7 @@ namespace ChatServer
 
         protected delegate void DisconnectAction(UserSession user);
 
-        protected void CheckConnections(List<UserSession> usersOnline, DisconnectAction Action)
+        protected void CheckConnections(DisconnectAction Action)
         {
             var activeConnections = 
                 IPGlobalProperties.
@@ -271,17 +257,20 @@ namespace ChatServer
                 GetActiveTcpConnections().
                 Where(x => x.LocalEndPoint.Equals(localEndPoint));
 
-            CONTINUE:
+            //CONTINUE:
             try
             {
-                foreach (var user in usersOnline)
+                for (var index = 0; index < usersOnline.Count; index++)
                 {
-                    var item = activeConnections.SingleOrDefault(x =>   x.LocalEndPoint.Equals(user.Client.Client.LocalEndPoint) &&
-                                                                        x.RemoteEndPoint.Equals(user.Client.Client.RemoteEndPoint));
+                    var user = usersOnline[index];
+                    var tcpConnections = (activeConnections as TcpConnectionInformation[]) ?? activeConnections.ToArray();
+                    var item = tcpConnections.SingleOrDefault(x =>
+                        x.LocalEndPoint.Equals(user.Client.Client.LocalEndPoint) &&
+                        x.RemoteEndPoint.Equals(user.Client.Client.RemoteEndPoint));
                     //Строго !(item.State == TcpState.Established), TcpState.Closed работает совершенно иначе (как???)
                     if (item == null || item.State != TcpState.Established)
                     {
-                        Action.Invoke(user);
+                        Action(user);
                     }
                 }
             }
@@ -290,7 +279,7 @@ namespace ChatServer
             {
                 if (e.Message == "Collection was modified; enumeration operation may not execute.")
                 {
-                    goto CONTINUE;
+                    //goto CONTINUE;
                 }
             }
         }

@@ -5,7 +5,7 @@ namespace ChatServer
     internal interface IUserSession
     {
         void Start();
-        void End();
+        void Dispose();
 
         void SendMessage(IBinarySerializable message);
         object ReceiveMessage();

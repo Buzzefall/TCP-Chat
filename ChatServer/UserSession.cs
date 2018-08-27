@@ -7,7 +7,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace ChatServer
 {
-    internal class UserSession : IUserSession
+    internal class UserSession : IUserSession, IDisposable
     {
         protected internal bool IsAuthorized { get; set; }
         protected internal string Login { get; set; }
@@ -20,7 +20,7 @@ namespace ChatServer
 
         ~UserSession()
         {
-            End();
+            Dispose();
         }
 
         public UserSession(TcpClient client)
@@ -38,7 +38,7 @@ namespace ChatServer
             UserID = null;
         }
 
-        public void End()
+        public void Dispose()
         {
             Stream?.Close();
             Client?.Close();

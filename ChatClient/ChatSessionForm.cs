@@ -12,16 +12,37 @@ namespace ChatClient
         // Ссылка на структуру данных клиента
         public ChatSession CurrentSession { get; set; }
 
+        //public delegate void UpdateChatCallback(TextMessage message);
+        //public delegate void UpdateOnlineListCallback(OnlineList list);
+
+        //public event UpdateChatCallback UpdateChatEvent;
+        //public event UpdateOnlineListCallback UpdateOnlineListEvent;
+
         // Уменьшаем кол-во вызовов конструкторов строк
         private readonly StringBuilder chatBuilder = new StringBuilder();
 
+        public ChatSessionForm(ChatClientForm owner)
+        {
+            InitializeComponent();
+
+            Owner = owner;
+            CurrentSession = owner.CurrentSession;
+            //CurrentSession.sessionForm = this;
+
+            //UpdateChatEvent += UpdateChat;
+            //UpdateOnlineListEvent += UpdateOnlineList;
+
+            MessageBox.ForeColor = Color.DarkGray;
+            MessageBox.Text = "Type something here...";
+            MessageBox.Update();
+        }
         // Код для обновления формы чата (View) через клиентскую модель
         public void UpdateChat(TextMessage message)
         {
             chatBuilder.Append($"[{message.TimeStamp}] {message.From}: {message.Text}");
             chatBuilder.Append(Environment.NewLine);
             ChatTextBox.Text = chatBuilder.ToString();
-            ChatTextBox.Update();
+            //ChatTextBox.Update();
         }
 
         public void UpdateOnlineList(OnlineList list)
@@ -35,23 +56,10 @@ namespace ChatClient
             }
 
             OnlineTextBox.Text = builder.ToString();
-            OnlineTextBox.Update();
+            //OnlineTextBox.Update();
 
             OnlineLabel.Text = $"Users online: {list.Count}";
-            OnlineLabel.Update();
-        }
-
-        public ChatSessionForm(ChatClientForm owner)
-        {
-            InitializeComponent();
-
-            Owner = owner;
-            CurrentSession = owner.CurrentSession;
-            //CurrentSession.sessionForm = this;
-
-            MessageBox.ForeColor = Color.DarkGray;
-            MessageBox.Text = "Type something here...";
-            MessageBox.Update();
+            //OnlineLabel.Update();
         }
 
         //public ChatSessionForm()
@@ -83,7 +91,7 @@ namespace ChatClient
             CurrentSession?.SendMessage(message);
 
             MessageBox.Clear();
-            MessageBox.Update();
+            //MessageBox.Update();
         }
 
         private void MessageBox_Enter(object sender, EventArgs e)
@@ -115,7 +123,7 @@ namespace ChatClient
         private void ChatSessionForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Owner.Visible = true;
-            CurrentSession?.End();
+            CurrentSession?.Dispose();
             (Owner as ChatClientForm)?.NewChatSession();
         }
 
