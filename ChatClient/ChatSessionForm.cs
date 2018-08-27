@@ -59,7 +59,20 @@ namespace ChatClient
             //OnlineTextBox.Update();
 
             OnlineLabel.Text = $"Users online: {list.Count}";
-            //OnlineLabel.Update();
+            OnlineLabel.Update();
+        }
+
+        public ChatSessionForm(ChatClientForm owner)
+        {
+            InitializeComponent();
+
+            Owner = owner;
+            CurrentSession = owner.CurrentSession;
+            //CurrentSession.sessionForm = this;
+
+            MessageBox.ForeColor = Color.DarkGray;
+            MessageBox.Text = "Type something here...";
+            MessageBox.Update();
         }
 
         //public ChatSessionForm()
