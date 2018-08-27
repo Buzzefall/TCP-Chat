@@ -153,6 +153,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Authorization";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatClientForm_FormClosing);
+            this.Load += new System.EventHandler(this.ChatClientForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

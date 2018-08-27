@@ -12,9 +12,30 @@ namespace ChatClient
         // Ссылка на структуру данных клиента
         public ChatSession CurrentSession { get; set; }
 
+        //public delegate void UpdateChatCallback(TextMessage message);
+        //public delegate void UpdateOnlineListCallback(OnlineList list);
+
+        //public event UpdateChatCallback UpdateChatEvent;
+        //public event UpdateOnlineListCallback UpdateOnlineListEvent;
+
         // Уменьшаем кол-во вызовов конструкторов строк
         private readonly StringBuilder chatBuilder = new StringBuilder();
 
+        public ChatSessionForm(ChatClientForm owner)
+        {
+            InitializeComponent();
+
+            Owner = owner;
+            CurrentSession = owner.CurrentSession;
+            //CurrentSession.sessionForm = this;
+
+            //UpdateChatEvent += UpdateChat;
+            //UpdateOnlineListEvent += UpdateOnlineList;
+
+            MessageBox.ForeColor = Color.DarkGray;
+            MessageBox.Text = "Type something here...";
+            MessageBox.Update();
+        }
         // Код для обновления формы чата (View) через клиентскую модель
         public void UpdateChat(TextMessage message)
         {
@@ -39,19 +60,6 @@ namespace ChatClient
 
             OnlineLabel.Text = $"Users online: {list.Count}";
             OnlineLabel.Update();
-        }
-
-        public ChatSessionForm(ChatClientForm owner)
-        {
-            InitializeComponent();
-
-            Owner = owner;
-            CurrentSession = owner.CurrentSession;
-            //CurrentSession.sessionForm = this;
-
-            MessageBox.ForeColor = Color.DarkGray;
-            MessageBox.Text = "Type something here...";
-            MessageBox.Update();
         }
 
         //public ChatSessionForm()
@@ -115,7 +123,7 @@ namespace ChatClient
         private void ChatSessionForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Owner.Visible = true;
-            CurrentSession?.End();
+            CurrentSession?.Dispose();
             (Owner as ChatClientForm)?.NewChatSession();
         }
 

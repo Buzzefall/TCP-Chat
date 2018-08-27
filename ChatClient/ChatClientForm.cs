@@ -9,15 +9,38 @@ namespace ChatClient
         /// Объект, реализующий взаимодействие клиента с сервером.
         public ChatSession CurrentSession;
 
-        /// Метод для обновления View логин-формы через клиентскую модель.
-        public async void UpdateView(string info, Color color)
+        //public delegate void NewChatSessionCallback();
+        //public delegate void UpdateViewCallback(string info, Color color);
+        //public delegate ChatSessionForm SwitchToChatCallback();
+
+        //public event NewChatSessionCallback NewChatSessionEvent;
+        //public event UpdateViewCallback UpdateViewEvent;
+        //public event SwitchToChatCallback FormSwitchToChatEvent;
+
+        //private readonly FormUpdateView UpdateViewEvent;
+        //private readonly FormSwitchToChat SwitchToChatEvent;
+        //private readonly FormNewChatSession NewChatSessionEvent;
+
+        public ChatClientForm()
+        {
+            StartPosition = FormStartPosition.CenterScreen;
+            InitializeComponent();
+
+            //NewChatSessionEvent += NewChatSession;
+            //UpdateViewEvent += UpdateView;
+            //FormSwitchToChatEvent += SwitchToChat;
+        }
+
+
+        /// Method that updates View of login form
+        public void UpdateView(string info, Color color)
         {
             InfoLabel.ForeColor = color;
             InfoLabel.Text = info;
             InfoLabel.Update();
         }
 
-        /// Метод, создающий форму для чат-сессии
+        /// Method that creates chat Form
         public ChatSessionForm SwitchToChat()
         {
             Visible = false;
@@ -28,7 +51,7 @@ namespace ChatClient
             return sessionForm;
         }
 
-        /// Метод, открывающий новое соединение с сервером
+        /// Create new ChatSession service
         public void NewChatSession()
         {
             // NameBox.Clear();
@@ -38,7 +61,7 @@ namespace ChatClient
             CurrentSession = new ChatSession(this);
         }
 
-        /// Запрос серверу на авторизацию
+        /// Authorization request
         private void SignIn()
         {
             if (string.IsNullOrWhiteSpace(PasswordBox.Text) ||
@@ -54,14 +77,6 @@ namespace ChatClient
         }
 
         // Обработчики событий, управляющих моделью клиента (Control)
-        public ChatClientForm()
-        {
-            StartPosition = FormStartPosition.CenterScreen;
-            InitializeComponent();
-
-            // Инициализируем объект с логикой и данными для чата
-            NewChatSession();
-        }
 
         private void LoginButton_Click(object sender, EventArgs e)
         {
@@ -71,7 +86,7 @@ namespace ChatClient
 
         private void ChatClientForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            CurrentSession.End();
+            CurrentSession.Dispose();
         }
 
         private void PasswordBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -99,6 +114,14 @@ namespace ChatClient
             e.Handled = true;
 
             SignIn();
+        }
+
+        private void ChatClientForm_Load(object sender, EventArgs e)
+        {
+            // Initializing ChatSession service.
+            // WARNING: Do not do this in a constructor since control's construction supposed async and can lead to InvalidOperationException
+            // immediately after Form.Invoke method call in NewChatSession. Here, controls guaranteed to be constructed already.
+            NewChatSession();
         }
     }
 }

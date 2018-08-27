@@ -10,31 +10,35 @@ using DataPackaging;
 
 namespace ChatClient
 {
-    public class ChatSession
+    public class ChatSession : IDisposable
     {
         //Ссылки на формы для взаимодействия с GUI
 
         protected internal ChatClientForm loginForm;
         protected internal ChatSessionForm sessionForm;
 
-        delegate void FormNewChatSession();
-        delegate ChatSessionForm FormSwitchToChat();
-        delegate void FormUpdateChat(TextMessage message);
-        delegate void FormUpdateOnlineList(OnlineList list);
         delegate void FormUpdateView(string info, Color color);
 
-        
-        private FormNewChatSession NewChatSession;
-        private FormSwitchToChat SwitchToChat;
+        delegate ChatSessionForm FormSwitchToChat();
+
+        delegate void FormNewChatSession();
+
+        delegate void FormUpdateChat(TextMessage message);
+
+        delegate void FormUpdateOnlineList(OnlineList list);
+
+
+        private readonly FormUpdateView UpdateView;
+        private readonly FormSwitchToChat SwitchToChat;
+        private readonly FormNewChatSession NewChatSession;
         private FormUpdateChat UpdateChat;
         private FormUpdateOnlineList UpdateOnlineList;
-        private FormUpdateView UpdateView;
-        
+
         protected internal string Login { get; private set; }
         protected internal string Password { get; private set; }
         protected internal string Name { get; private set; }
         protected internal int UserID { get; private set; }
-        
+
         protected internal IPEndPoint RemoteEndPoint { get; private set; }
         protected internal IPEndPoint LocalEndPoint { get; private set; }
 
@@ -50,12 +54,11 @@ namespace ChatClient
         ~ChatSession()
         {
             // 
-            End();
+            Dispose();
         }
 
         public ChatSession(ChatClientForm loginform)
         {
-
             loginForm = loginform;
             RemoteEndPoint = new IPEndPoint(IPAddress.Loopback, 33777);
             LocalEndPoint = new IPEndPoint(IPAddress.Loopback, 0);
@@ -63,28 +66,24 @@ namespace ChatClient
             UpdateView = loginForm.UpdateView;
             NewChatSession = loginForm.NewChatSession;
             SwitchToChat = loginForm.SwitchToChat;
-            
+
             IsRunning = true;
             var connectThread = new Thread(Start);
             connectThread.Start();
-
-
         }
 
-        public void End()
+        public void Dispose()
         {
-            //Флаг прекращения работы, который воспримет ListenThread
+            // Flag to shutdown ListenThread()
             IsRunning = false;
             //
-            ListenThread?.Abort();
+            //ListenThread?.Abort();
             Stream?.Close();
             Client?.Close();
         }
 
         public void Start()
         {
-            
-            
             var task = loginForm.BeginInvoke(UpdateView, "Attempting to connect...", Color.Blue);
             //var result = loginForm.EndInvoke(task);
 
@@ -96,14 +95,12 @@ namespace ChatClient
                 try
                 {
                     Client = new TcpClient(RemoteEndPoint.Address.ToString(), RemoteEndPoint.Port);
-
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                     Thread.Sleep(50);
                 }
-
             } while (Client == null);
 
             if (!IsRunning) return;
@@ -120,9 +117,9 @@ namespace ChatClient
 
             if (!IsConnected())
             {
-                End();
                 CrashAndReport(new Exception("Connection is lost. Attempting to reconnect..."));
                 loginForm.BeginInvoke(NewChatSession);
+                Dispose();
                 return;
             }
 
@@ -146,12 +143,12 @@ namespace ChatClient
             if (Stream.DataAvailable)
             {
                 var message = ReceiveMessage();
-                
+
                 if (message?.GetType() == typeof(TextMessage) && (message as TextMessage).Text == "Access granted!")
                 {
                     loginForm.BeginInvoke(UpdateView, "Access granted!", Color.Blue);
                     Thread.Sleep(350);
-                    
+
                     var form = loginForm.Invoke(SwitchToChat);
                     sessionForm = (ChatSessionForm) form;
 
@@ -210,11 +207,10 @@ namespace ChatClient
                     {
                         CrashAndReport(e);
                     }
+
                     return;
                 }
-                
             }
-
         }
 
         public void SendMessage(IBinarySerializable message)
@@ -226,6 +222,7 @@ namespace ChatClient
                     CrashAndReport(new Exception("There is no active connection!"));
                     return;
                 }
+
                 //Запаковываем сообщение и отсылаем
                 message.SerializeBytes(Stream);
             }
@@ -244,7 +241,6 @@ namespace ChatClient
                 {
                     return new BinaryFormatter().Deserialize(Stream);
                 }
-                
             }
 
             catch (Exception e)
@@ -257,14 +253,13 @@ namespace ChatClient
 
         private bool IsConnected()
         {
-            var activeConnections = 
-                IPGlobalProperties.
-                GetIPGlobalProperties().
-                GetActiveTcpConnections().
-                Where(x => x.LocalEndPoint.Equals(Client.Client.LocalEndPoint));
+            var activeConnections =
+                IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpConnections()
+                    .Where(x => x.LocalEndPoint.Equals(Client.Client.LocalEndPoint));
 
-            var currentConnection = activeConnections.SingleOrDefault(x =>  x.LocalEndPoint.Equals(Client.Client.LocalEndPoint) &&
-                                                                            x.RemoteEndPoint.Equals(Client.Client.RemoteEndPoint));
+            var currentConnection = activeConnections.SingleOrDefault(x =>
+                x.LocalEndPoint.Equals(Client.Client.LocalEndPoint) &&
+                x.RemoteEndPoint.Equals(Client.Client.RemoteEndPoint));
 
             //Строго !(item.State == TcpState.Established), TcpState.Closed работает совершенно иначе (как???)
             return currentConnection != null && currentConnection.State == TcpState.Established;
