@@ -7,7 +7,7 @@ namespace ChatClient
     public partial class ChatClientForm : Form
     {   
         /// Объект, реализующий взаимодействие клиента с сервером.
-        public ChatSession CurrentSession;
+        public ChatSession currentSession;
 
         //public delegate void NewChatSessionCallback();
         //public delegate void UpdateViewCallback(string info, Color color);
@@ -58,7 +58,7 @@ namespace ChatClient
             // LoginBox.Clear();
             // PasswordBox.Clear();
             InfoLabel.Text = "";
-            CurrentSession = new ChatSession(this);
+            currentSession = new ChatSession(this);
         }
 
         /// Authorization request
@@ -72,7 +72,7 @@ namespace ChatClient
                 return;
             }
 
-            CurrentSession.SignIn(NameBox.Text, LoginBox.Text, PasswordBox.Text);
+            currentSession.SignIn(NameBox.Text, LoginBox.Text, PasswordBox.Text);
             PasswordBox.Clear();
         }
 
@@ -86,33 +86,27 @@ namespace ChatClient
 
         private void ChatClientForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            CurrentSession.Dispose();
+            currentSession.Dispose();
         }
 
         private void PasswordBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char) Keys.Enter) return;
-            
             e.Handled = true;
-
             SignIn();
         }
 
         private void LoginBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char) Keys.Enter) return;
-            
             e.Handled = true;
-
             SignIn();
         }
 
         private void NameBox_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != (char) Keys.Enter) return;
-            
             e.Handled = true;
-
             SignIn();
         }
 

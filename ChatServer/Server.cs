@@ -18,11 +18,11 @@ namespace ChatServer
         //private const int queueLimit = 100;
         public bool IsRunning { get; private set; }
 
-        protected internal const int mainPort = 33777;
+        protected internal const int MainPort = 33777;
 
         protected internal TcpListener Listener { get; set; }
         
-        protected internal readonly IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Loopback, mainPort);
+        protected internal readonly IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Loopback, MainPort);
 
         protected internal readonly UserSession systemSession;
         protected internal readonly List<UserSession> usersToAuthorize = new List<UserSession>();
@@ -33,7 +33,7 @@ namespace ChatServer
         public Server()
         {
             IsRunning = false;
-            systemSession = new UserSession(new TcpClient()) { Name = "System", UserID = "0" };
+            systemSession = new UserSession(new TcpClient()) { Name = "System", UserId = "0" };
         }
 
         public void Start()
@@ -113,9 +113,9 @@ namespace ChatServer
                 {
                     var client = Listener.AcceptTcpClient();
 
-                    var clientIP = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
+                    var clientIp = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString();
                     var clientPort = ((IPEndPoint)client.Client.RemoteEndPoint).Port.ToString();
-                    Console.WriteLine("\n[System] Incoming connection request from {0}:{1}...", clientIP, clientPort);
+                    Console.WriteLine("\n[System] Incoming connection request from {0}:{1}...", clientIp, clientPort);
 
                     var session = new UserSession(client);
                     usersToAuthorize.Add(session);
@@ -147,7 +147,7 @@ namespace ChatServer
                 if (message.GetType() == typeof(UserData))
                 {
                     // Вставить код для авторизации
-                    user.UserID = (usersOnline.Count + 1).ToString();
+                    user.UserId = (usersOnline.Count + 1).ToString();
                     user.Name = (message as UserData)?.Name;
                     user.Login = (message as UserData)?.Login;
                     user.Password = (message as UserData)?.Password;
@@ -249,7 +249,7 @@ namespace ChatServer
 
         protected delegate void DisconnectAction(UserSession user);
 
-        protected void CheckConnections(DisconnectAction Action)
+        protected void CheckConnections(DisconnectAction action)
         {
             var activeConnections = 
                 IPGlobalProperties.
@@ -270,7 +270,7 @@ namespace ChatServer
                     //Строго !(item.State == TcpState.Established), TcpState.Closed работает совершенно иначе (как???)
                     if (item == null || item.State != TcpState.Established)
                     {
-                        Action(user);
+                        action(user);
                     }
                 }
             }

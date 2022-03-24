@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.IO;
 using DataPackaging;
 using System.Runtime.Serialization.Formatters.Binary;
+using DataPackaging.Interfaces;
 
 namespace ChatServer
 {
@@ -13,7 +14,7 @@ namespace ChatServer
         protected internal string Login { get; set; }
         protected internal string Password { get; set; }
         protected internal string Name { get; set; }
-        protected internal string UserID { get; set; }
+        protected internal string UserId { get; set; }
 
         protected internal TcpClient Client { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
@@ -35,7 +36,7 @@ namespace ChatServer
             Login = null;
             Password = null;
             Name = null;
-            UserID = null;
+            UserId = null;
         }
 
         public void Dispose()
@@ -105,7 +106,7 @@ namespace ChatServer
 
         public string PrintInfo()
         {
-            string output = "UserID: " + UserID + Environment.NewLine +
+            string output = "UserID: " + UserId + Environment.NewLine +
                             "User Name: " + Name + Environment.NewLine +
                             "Login: " + Login + Environment.NewLine +
                             "Password: " + Password + Environment.NewLine + "----------------" + Environment.NewLine;

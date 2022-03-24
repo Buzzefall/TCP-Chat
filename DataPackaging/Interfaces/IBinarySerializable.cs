@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace DataPackaging
+namespace DataPackaging.Interfaces
 {
     public interface IBinarySerializable
     {

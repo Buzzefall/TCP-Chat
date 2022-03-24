@@ -1,4 +1,5 @@
 ﻿using DataPackaging;
+using DataPackaging.Interfaces;
 
 namespace ChatServer
 {

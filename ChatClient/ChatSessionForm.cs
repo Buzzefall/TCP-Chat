@@ -19,14 +19,14 @@ namespace ChatClient
         //public event UpdateOnlineListCallback UpdateOnlineListEvent;
 
         // Уменьшаем кол-во вызовов конструкторов строк
-        private readonly StringBuilder chatBuilder = new StringBuilder();
+        private readonly StringBuilder _chatBuilder = new StringBuilder();
 
         public ChatSessionForm(ChatClientForm owner)
         {
             InitializeComponent();
 
             Owner = owner;
-            CurrentSession = owner.CurrentSession;
+            CurrentSession = owner.currentSession;
             //CurrentSession.sessionForm = this;
 
             //UpdateChatEvent += UpdateChat;
@@ -36,12 +36,13 @@ namespace ChatClient
             MessageBox.Text = "Type something here...";
             MessageBox.Update();
         }
-        // Код для обновления формы чата (View) через клиентскую модель
+
+        // Обновление View клиента
         public void UpdateChat(TextMessage message)
         {
-            chatBuilder.Append($"[{message.TimeStamp}] {message.From}: {message.Text}");
-            chatBuilder.Append(Environment.NewLine);
-            ChatTextBox.Text = chatBuilder.ToString();
+            _chatBuilder.Append($"[{message.TimeStamp}] {message.From}: {message.Text}");
+            _chatBuilder.Append(Environment.NewLine);
+            ChatTextBox.Text = _chatBuilder.ToString();
             //ChatTextBox.Update();
         }
 
@@ -60,19 +61,6 @@ namespace ChatClient
 
             OnlineLabel.Text = $"Users online: {list.Count}";
             OnlineLabel.Update();
-        }
-
-        public ChatSessionForm(ChatClientForm owner)
-        {
-            InitializeComponent();
-
-            Owner = owner;
-            CurrentSession = owner.CurrentSession;
-            //CurrentSession.sessionForm = this;
-
-            MessageBox.ForeColor = Color.DarkGray;
-            MessageBox.Text = "Type something here...";
-            MessageBox.Update();
         }
 
         //public ChatSessionForm()
@@ -142,7 +130,7 @@ namespace ChatClient
 
         private void ChatTextBox_TextChanged(object sender, EventArgs e)
         {
-            Utils.SendMessage(ChatTextBox.Handle, Utils.WM_VSCROLL, (IntPtr) Utils.SB_BOTTOM, IntPtr.Zero);
+            Utils.SendMessage(ChatTextBox.Handle, Utils.WmVscroll, (IntPtr) Utils.SbBottom, IntPtr.Zero);
         }
 
     }
@@ -152,8 +140,8 @@ namespace ChatClient
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SendMessage(IntPtr hWnd, int wMsg, IntPtr wParam, IntPtr lParam);
 
-        public const int WM_VSCROLL = 0x115;
-        public const int SB_BOTTOM = 7;
+        public const int WmVscroll = 0x115;
+        public const int SbBottom = 7;
 
         /// <summary>
         /// Scrolls the vertical scroll bar of a multi-line text box to the bottom.
@@ -161,7 +149,7 @@ namespace ChatClient
         /// <param name="tb">The text box to scroll</param>
         public static void ScrollToBottom(TextBox tb)
         {
-            SendMessage(tb.Handle, WM_VSCROLL, (IntPtr)SB_BOTTOM, IntPtr.Zero);
+            SendMessage(tb.Handle, WmVscroll, (IntPtr)SbBottom, IntPtr.Zero);
         }
     }
 }

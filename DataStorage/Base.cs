@@ -7,9 +7,9 @@ namespace DataStorage
     public class DataBase : IBase, IDisposable
     {
         //[PrimaryKey]
-        private readonly string dbFileLocation;
-        private readonly string dbFileName;
-        private readonly string dbFilePath;
+        private readonly string _dbFileLocation;
+        private readonly string _dbFileName;
+        private readonly string _dbFilePath;
 
         //private SQLiteConnection Connection { get; set; }
         //private SQLiteCommand Command { get; set; }

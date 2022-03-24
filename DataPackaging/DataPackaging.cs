@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
+using DataPackaging.Interfaces;
 
 namespace DataPackaging
 {
@@ -19,16 +20,16 @@ namespace DataPackaging
     public class UserData : Data
     {
         //[PrimaryKey, ]
-        protected string _UserID;
+        protected string userId;
         protected string _Name;
         protected string _Login;
         protected string _Password;
 
-        public string UserID
+        public string UserId
         {
-            get => _UserID;
+            get => userId;
 
-            set => _UserID = value;
+            set => userId = value;
         }
 
         public string Name
