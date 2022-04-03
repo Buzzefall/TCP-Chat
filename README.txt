@@ -1,1 +1,1 @@
-.NET TCP Chat using Windows Forms and SQLite and a little bit of street magic ( @ _ @)
+.NET TCP Chat using Windows Forms (demo)
