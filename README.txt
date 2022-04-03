@@ -1,4 +1,1 @@
-Git пробуем-с, значится!
-Итак, очередной коммит.
-
-UPD: попробуем команду pull теперь!
+.NET TCP Chat using Windows Forms (demo)
